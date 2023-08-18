@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:tournament_client/example.dart';
 import 'package:tournament_client/home.dart';
+import 'package:tournament_client/home2.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: ExamplePage(data: [],)
-      home: const MyHomePage(title: 'Tournament Client Page'),
+      home: const MyHomePage2(title: 'Tournament Client'),
     );
   }
 }
