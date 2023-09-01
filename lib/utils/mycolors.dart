@@ -37,6 +37,7 @@ class MyColor {
   static final Color yellow3 = Color(0xffFFC107);
   static final Color yellow_accent = Color(0xFFB2A76B);
   static final Color orange = Color(0xFFFE9433);
+  static final Color orang3 = Color(0xFFA98E71);
   static final Color pink = Color(0xFFFFC0CB);
   static final Color orange_accent = Color(0xFFA87954);
   static final Color red_bg = Color(0xFFFEF6F8).withOpacity(0.75);

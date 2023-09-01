@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ExamplePage extends StatefulWidget {
-  final List<Map<String, dynamic>> data;
+  // final List<Map<String, dynamic>> data;
 
-  ExamplePage({required this.data});
+  // ExamplePage({required this.data});
 
   @override
   _ExamplePageState createState() => _ExamplePageState();
@@ -16,7 +16,7 @@ class _ExamplePageState extends State<ExamplePage> {
   @override
   void initState() {
     super.initState();
-    _animatedData = List<Map<String, dynamic>>.from(widget.data);
+    // _animatedData = List<Map<String, dynamic>>.from(widget.data);
   }
 
   void _moveItemWithAnimation() {

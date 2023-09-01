@@ -21,8 +21,7 @@ class MyHomePage2 extends StatefulWidget {
 }
 
 class _MyHomePage2State extends State<MyHomePage2> {
-  String? url =
-      'https://cdn.pixabay.com/photo/2023/07/10/06/13/mountain-8117525_1280.jpg';
+  String? url ='https://cdn.pixabay.com/photo/2023/07/10/06/13/mountain-8117525_1280.jpg';
 
   IO.Socket? socket;
   StreamController<List<Map<String, dynamic>>> _streamController =

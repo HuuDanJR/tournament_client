@@ -1,11 +1,13 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:tournament_client/animatelist.dart';
-import 'package:tournament_client/example.dart';
-import 'package:tournament_client/widget/listview.dart';
+import 'package:tournament_client/lib/bar_chart.widget.dart';
+import 'package:tournament_client/lib/bar_chart_race.dart';
+import 'package:tournament_client/utils/mycolors.dart';
 import 'package:tournament_client/widget/snackbar.custom.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -27,8 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // Connect to the socket.io server
-    socket = IO.io('http://30.0.0.82:8090', <String, dynamic>{
+    socket = IO.io('http://192.168.101.58:8099', <String, dynamic>{
       'transports': ['websocket'],
     });
     socket!.onConnect((_) {
@@ -37,25 +38,45 @@ class _MyHomePageState extends State<MyHomePage> {
     socket!.onDisconnect((_) {
       print('Disconnected from server');
     });
+    // socket!.on('eventFromServer', (data) {
+    //   List<Map<String, dynamic>> stationData = List<Map<String, dynamic>>.from(data);
+    //   _streamController.add(stationData);
+    // });
     socket!.on('eventFromServer', (data) {
-      // print('Received data from server: $data');
-      List<Map<String, dynamic>> stationData =
-          List<Map<String, dynamic>>.from(data);
-      _streamController.add(stationData);
+      if (data is List<dynamic>) {
+        List<List<double>> stationData = [];
+
+        for (dynamic item in data) {
+          if (item is List<dynamic>) {
+            List<double> doubleList = [];
+            for (dynamic value in item) {
+              if (value is num) {
+                doubleList.add(value.toDouble());
+              }
+            }
+            stationData.add(doubleList);
+            // print('stationData: ${stationData}');
+          }
+        }
+
+        List<Map<String, dynamic>> formattedData = stationData.map((list) {
+          return {'data': List<double>.from(list)};
+        }).toList();
+
+        _streamController.add(formattedData);
+      }
     });
 
     socket!.emit('eventFromClient');
   }
 
   void _delete(int stationId) {
-    // Emit an event to the server for delete with the given stationId
     socket!.emit('eventFromClientDelete', {'stationId': stationId});
     String message = 'Data deleted with stationId ${stationId}';
     snackbar_custom(context: context, text: message);
   }
 
   void _create() {
-    // Emit an event to the server for delete with the given stationId
     socket!.emit('eventFromClientAdd', {
       "machine": "RL-TEST",
       "member": "1",
@@ -72,7 +93,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    // Disconnect from the socket.io server when the widget is disposed
     socket!.disconnect();
     _streamController.close();
     super.dispose();
@@ -84,55 +104,71 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      //   title: Text(widget.title),
-      // ),
       body: SafeArea(
         child: StreamBuilder<List<Map<String, dynamic>>>(
           stream: _streamController.stream,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              final stationData = snapshot.data!;
+              final stationDataList = snapshot.data!;
+              final formattedData =
+                  stationDataList.map<List<double>>((dataMap) {
+                if (dataMap['data'] is List<double>) {
+                  final dataList = dataMap['data'] as List<double>;
+                  return dataList;
+                }
+                return [];
+              }).toList();
+              if (snapshot.data!.isEmpty || snapshot.data == null || snapshot.data ==[]) {
+                return Text('empty data');
+              }
+
               return ScrollConfiguration(
                 behavior: ScrollConfiguration.of(context).copyWith(
                   physics: const BouncingScrollPhysics(),
                   dragDevices: {
                     PointerDeviceKind.touch,
                     PointerDeviceKind.mouse,
-                    PointerDeviceKind.trackpad
+                    PointerDeviceKind.trackpad,
                   },
                 ),
                 child: RefreshIndicator(
                     onRefresh: _refresh,
-                    child:
-                    ExamplePage(data: stationData)
-                    //  ListView.builder(
-                    //   padding: const EdgeInsets.all(32),
-                    //   // shrinkWrap: true,
-                    //   itemCount: stationData.length,
-                    //   itemBuilder: (context, index) {
-                    //     // Use the station data to build your UI here
-                    //     final data = stationData[index];
-                    //     return Card(
-                    //       child: ListTile(
-                    //         leading: index == 1 || index == 2 || index == 0
-                    //             ? Icon(Icons.star, color: Colors.redAccent)
-                    //             : Container(
-                    //                 width: 1,
-                    //                 height: 1,
-                    //               ),
-                    //         title: Text('Member: ${data['member']}'),
-                    //         subtitle: Text('credit: ${data['credit']}'),
-                    //       ),
-                    //     );
-                    //   },
-                    // )
-                    
-                    ),
+                    child: BarChartRace(
+                      data: convertData(formattedData),
+                      initialPlayState: true,
+                      columnsColor: colorList,
+                      // columnsColor: shuffleColorList(),
+                      framesPerSecond: 90,
+                      framesBetweenTwoStates: 90,
+                      numberOfRactanglesToShow: formattedData[0].length,
+                      title: "DYNAMIC RANKING",
+                      columnsLabel: formattedData[0].map((value) => 'PLAYER ${value.toStringAsFixed(0)}').toList(),
+                      // [
+                      //   "Amazon",
+                      //   "Google",
+                      //   "Apple",
+                      //   "Coca",
+                      //   "Huawei",
+                      //   "Sony",
+                      //   'Pepsi',
+                      //   "Samsung",
+                      //   "Netflix",
+                      //   "Facebook",
+                      // ],
+                      statesLabel: List.generate(
+                        30,
+                        (index) => formatDate(
+                          DateTime.now().add(
+                            Duration(days: index),
+                          ),
+                        ),
+                      ),
+                      titleTextStyle: GoogleFonts.nunitoSans(
+                        color: Colors.black,
+                        fontSize: 32,
+                      ),
+                    )),
               );
             } else {
               return const Center(
@@ -141,46 +177,94 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
         ),
-      ),
-      floatingActionButton: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              print('order listview');
-            },
-            tooltip: 'Order',
-            child: const Icon(Icons.bar_chart),
-          ),
-          const SizedBox(width: 16),
-          FloatingActionButton(
-            onPressed: () {
-              _create();
-            },
-            tooltip: 'Create',
-            child: const Icon(Icons.create_outlined),
-          ),
-          const SizedBox(width: 16),
-          FloatingActionButton(
-
-            onPressed: () {
-              // snackbar_custom(context: context, text: "Delete Data");
-              _delete(1241);
-            },
-            tooltip: 'Delete',
-            child: const Icon(Icons.delete_outline),
-          ),
-          const SizedBox(width: 16),
-          FloatingActionButton(
-            onPressed: () {
-              snackbar_custom(context: context, text: "Refeshing Data");
-              _refresh();
-            },
-            tooltip: 'Refresh',
-            child: const Icon(Icons.refresh_rounded),
-          ),
-        ],
+        // barcharcustom(formattedData)
+        // BarCharRace(data: formattedData,)
+        // StreamBuilder<List<Map<String, dynamic>>>(
+        //   stream: _streamController.stream,
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasData) {
+        //       final stationData = snapshot.data!;
+        //       return ScrollConfiguration(
+        //         behavior: ScrollConfiguration.of(context).copyWith(
+        //           physics: const BouncingScrollPhysics(),
+        //           dragDevices: {
+        //             PointerDeviceKind.touch,
+        //             PointerDeviceKind.mouse,
+        //             PointerDeviceKind.trackpad
+        //           },
+        //         ),
+        //         child: RefreshIndicator(
+        //             onRefresh: _refresh, child: Text('$stationData')
+        //             // ExamplePage(data: stationData)
+        //             ),
+        //       );
+        //     } else {
+        //       return const Center(
+        //         child: CircularProgressIndicator(),
+        //       );
+        //     }
+        //   },
+        // ),
       ),
     );
   }
 }
+
+List<List<double>> convertData(data) {
+  if (data.length == 2) {
+    return [data.last];
+  } else if (data.length == 3) {
+    return [data[1], data.last];
+  }
+  return data;
+}
+
+class FormattedDataText extends StatelessWidget {
+  final List<List<double>> formattedData;
+
+  FormattedDataText({required this.formattedData});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('$formattedData');
+  }
+}
+List<Color> colorList = [
+  // MyColor.green_araconda,
+  // MyColor.pink,
+  // MyColor.pinkMain,
+  // Color(0xFFEF5350),
+  // MyColor.grey,
+  // Color(0xFFFFD600),
+  // const Color(0xFFEF6C00),
+  // // const Color(0xFFC6FF00),
+  // MyColor.blue_coinbase,
+  // const Color(0xFF00E5FF),
+  // Color(0xFF424242),
+  MyColor.orang3,
+  MyColor.orang3,
+  MyColor.orang3,
+  MyColor.orang3,
+  MyColor.green_araconda,
+  MyColor.orang3,
+  MyColor.orang3,
+  MyColor.orang3,
+  MyColor.orang3,
+  MyColor.orang3,
+];
+
+// List<Color> shuffleColorList() {
+//   final random = Random();
+//   final sublistLength = 10;
+
+//   // Make sure the sublist length doesn't exceed the length of the color list
+//   final shuffledList = colorList.sublist(0, sublistLength)..shuffle(random);
+
+//   // Create a new list with the shuffled sublist
+//   final newList = List<Color>.from(colorList);
+//   for (int i = 0; i < sublistLength; i++) {
+//     newList[i] = shuffledList[i];
+//   }
+  
+//   return newList;
+// }
