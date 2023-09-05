@@ -3,49 +3,44 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:tournament_client/lib/bar_chart.widget.dart';
 import 'package:tournament_client/lib/bar_chart_race.dart';
-import 'package:tournament_client/lib/getx/controller.get.dart';
 import 'package:tournament_client/utils/mycolors.dart';
 import 'package:tournament_client/widget/snackbar.custom.dart';
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title, required this.selectedIndex});
+class MyHomeFuture extends StatefulWidget {
+  const MyHomeFuture({super.key, required this.title});
 
   final String title;
-  int? selectedIndex;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomeFuture> createState() => _MyHomeFutureState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  IO.Socket? socket;
-  StreamController<List<Map<String, dynamic>>> _streamController = StreamController<List<Map<String, dynamic>>>.broadcast();
-  List<Map<String, dynamic>> stationData = [];
-  Map<String, AnimationController> _animationControllers = {};
-  final controllerGetX = Get.put(MyGetXController());
-
-  @override
-  void initState() {
-    super.initState();
-    socket = IO.io('http://localhost:8090', <String, dynamic>{
+class _MyHomeFutureState extends State<MyHomeFuture> {
+  late IO.Socket socket;
+  
+  Future<List<Map<String, dynamic>>> _initializeSocket() async {
+    socket = IO.io('http://192.168.101.58:8099', <String, dynamic>{
       'transports': ['websocket'],
     });
-    socket!.onConnect((_) {
+    
+    socket.onConnect((_) {
       print('Connected to server');
     });
-    socket!.onDisconnect((_) {
+    socket.onDisconnect((_) {
       print('Disconnected from server');
     });
-    // socket!.on('eventFromServer', (data) {
-    //   List<Map<String, dynamic>> stationData = List<Map<String, dynamic>>.from(data);
-    //   _streamController.add(stationData);
-    // });
-    socket!.on('eventFromServer', (data) {
+    
+    await socket.connect(); // Await the connection
+    
+    socket.emit('eventFromClient');
+
+    final completer = Completer<List<Map<String, dynamic>>>();
+
+    socket.on('eventFromServer', (data) {
       if (data is List<dynamic>) {
         List<List<double>> stationData = [];
 
@@ -58,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             }
             stationData.add(doubleList);
-            print('stationData_: ${stationData}');
+            print('stationData: ${stationData}');
           }
         }
 
@@ -66,54 +61,19 @@ class _MyHomePageState extends State<MyHomePage> {
           return {'data': List<double>.from(list)};
         }).toList();
 
-        _streamController.add(formattedData);
-        final finalData = formattedData.map<List<double>>((dataMap) {
-          if (dataMap['data'] is List<double>) {
-            final dataList = dataMap['data'] as List<double>;
-            return dataList;
-          }
-          return [];
-        }).toList();
-        // setState(() {
-        //   widget.selectedIndex = (detect(1, finalData[0]));
-        //   // print('selected index: ${widget.selectedIndex}');
-        // });
+        completer.complete(formattedData);
       }
     });
 
-    socket!.emit('eventFromClient');
-  }
-
-  void _delete(int stationId) {
-    socket!.emit('eventFromClientDelete', {'stationId': stationId});
-    String message = 'Data deleted with stationId ${stationId}';
-    snackbar_custom(context: context, text: message);
-  }
-
-  void _create() {
-    socket!.emit('eventFromClientAdd', {
-      "machine": "RL-TEST",
-      "member": "1",
-      "bet": "799999",
-      "credit": "799999",
-      "connect": "1",
-      "status": "0",
-      "aft": "0",
-      "lastupdate": "2023-07-28"
-    });
-    String message = 'Created an record';
-    snackbar_custom(context: context, text: message);
+    return completer.future;
   }
 
   @override
-  void dispose() {
-    socket!.disconnect();
-    _streamController.close();
-    controllerGetX.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _initializeSocket();
   }
-
-  Future<Null> _refresh() async {
+   Future<Null> _refresh() async {
     socket!.emit('eventFromClient');
   }
 
@@ -121,10 +81,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: StreamBuilder<List<Map<String, dynamic>>>(
-          stream: _streamController.stream,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
+        child: 
+       FutureBuilder<List<Map<String, dynamic>>>(
+      future: _initializeSocket(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return const Center(
+            child: Text('Error'),
+          );
+        }  
+        if (snapshot.hasData) {
               final stationDataList = snapshot.data!;
               final formattedData =
                   stationDataList.map<List<double>>((dataMap) {
@@ -137,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if (snapshot.data!.isEmpty ||
                   snapshot.data == null ||
                   snapshot.data == []) {
-                return const Text('empty data');
+                return Text('empty data');
               }
 
               return ScrollConfiguration(
@@ -152,10 +122,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: RefreshIndicator(
                     onRefresh: _refresh,
                     child: BarChartRace(
-                      selectedIndex: widget.selectedIndex,
-                      // index: 1,
-                      // index: selectedIndex,
-                      index: detect(widget.selectedIndex!.toDouble(), formattedData[0]),
+                      index: detect(1, formattedData[0]),
+                      // index:0,
                       data: convertData(formattedData),
                       initialPlayState: true,
                       // columnsColor: changeList(detect(1, formattedData[0])),
@@ -165,10 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       framesBetweenTwoStates: 90,
                       numberOfRactanglesToShow: formattedData[0].length,
                       title: "DYNAMIC RANKING",
-                      columnsLabel: formattedData[0]
-                          .map((value) =>
-                              'PLAYER ${value < 10 ? '0$value' : value.toStringAsFixed(0)}')
-                          .toList(),
+                      columnsLabel: formattedData[0].map((value) =>'PLAYER ${value < 10 ? '0$value' : value.toStringAsFixed(0)}').toList(),
                       statesLabel: List.generate(
                         30,
                         (index) => formatDate(
@@ -178,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       titleTextStyle: GoogleFonts.nunitoSans(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 32,
                       ),
                     )),
@@ -188,36 +153,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: CircularProgressIndicator(),
               );
             }
-          },
-        ),)
-        // barcharcustom(formattedData)
-        // BarCharRace(data: formattedData,)
-        // StreamBuilder<List<Map<String, dynamic>>>(
-        //   stream: _streamController.stream,
-        //   builder: (context, snapshot) {
-        //     if (snapshot.hasData) {
-        //       final stationData = snapshot.data!;
-        //       return ScrollConfiguration(
-        //         behavior: ScrollConfiguration.of(context).copyWith(
-        //           physics: const BouncingScrollPhysics(),
-        //           dragDevices: {
-        //             PointerDeviceKind.touch,
-        //             PointerDeviceKind.mouse,
-        //             PointerDeviceKind.trackpad
-        //           },
-        //         ),
-        //         child: RefreshIndicator(
-        //             onRefresh: _refresh, child: Text('$stationData')
-        //             // ExamplePage(data: stationData)
-        //             ),
-        //       );
-        //     } else {
-        //       return const Center(
-        //         child: CircularProgressIndicator(),
-        //       );
-        //     }
-        //   },
-        // ),
+      },
+    )
+      ),
     );
   }
 }
@@ -262,6 +200,7 @@ List<Color> changeList(int index) {
 
   List<Color> colorList = List.generate(10, (i) => MyColor.orang3);
   colorList[index] = MyColor.green_araconda;
+  print(colorList);
   return colorList;
 }
 
@@ -278,29 +217,11 @@ int detect(double targetIndex, List<double> myList) {
 List<Color> shuffleColorList() {
   final random = Random();
   final sublistLength = 10;
-
-  // Make sure the sublist length doesn't exceed the length of the color list
   final shuffledList = colorList.sublist(0, sublistLength)..shuffle(random);
-
   // Create a new list with the shuffled sublist
   final newList = List<Color>.from(colorList);
   for (int i = 0; i < sublistLength; i++) {
     newList[i] = shuffledList[i];
   }
-
   return newList;
 }
-
-
-// [
-//  "Amazon",
-//   "Google",
-//   "Apple",
-//   "Coca",
-//   "Huawei",
-//   "Sony",
-//   'Pepsi',
-//   "Samsung",
-//   "Netflix",
-//   "Facebook",
-// ],

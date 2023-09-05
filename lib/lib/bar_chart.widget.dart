@@ -6,6 +6,7 @@ import 'package:tournament_client/race_chart_page.dart';
 Widget barcharcustom(data) {
   return BarChartRace(
     data: data,
+    index: 1,
     initialPlayState: true,
     columnsColor: [
       Color(0xFFFF9900),

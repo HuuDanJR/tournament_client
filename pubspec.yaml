@@ -37,6 +37,7 @@ dependencies:
   fluttertoast: ^8.2.2
   get: ^4.6.5
   google_fonts: ^5.1.0
+  intl: ^0.18.1
   socket_io_client: ^2.0.3+1
   syncfusion_flutter_charts: ^22.2.9
 
@@ -64,6 +65,8 @@ flutter:
     - asset/winner.png
     - asset/no_image.png
     - asset/image/logo_renew.png
+    - asset/image/logo_new.png
+    - asset/image/background.png
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

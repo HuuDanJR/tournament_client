@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tournament_client/lib/models/rectangle.dart';
+import 'package:tournament_client/service/format.factory.dart';
+import 'package:tournament_client/utils/mycolors.dart';
 
 class MyStatePaint extends CustomPainter {
   final List<Rectangle> currentState;
@@ -9,6 +11,7 @@ class MyStatePaint extends CustomPainter {
   final double totalWidth;
   final int numberOfRactanglesToShow;
   final String title;
+  final int? index;
   final TextStyle titleTextStyle;
 
   // rectangle paint
@@ -25,6 +28,7 @@ class MyStatePaint extends CustomPainter {
     required this.totalWidth,
     required this.rectHeight,
     required this.title,
+    this.index,
     required this.titleTextStyle,
 
     // required this.rectPaint,
@@ -46,7 +50,7 @@ class MyStatePaint extends CustomPainter {
     maxLength = totalWidth * 0.9;
   }
 
-  final double spaceBetweenTwoRectangles = 22;
+  final double spaceBetweenTwoRectangles = 16;
   final double yShift = 50;
   final double xShift = 70;
   // define text painter to paint text (write text)
@@ -55,8 +59,12 @@ class MyStatePaint extends CustomPainter {
     textDirection: TextDirection.ltr,
   );
   final TextStyle textStyle = GoogleFonts.bebasNeue(
-    color: Colors.black,
+    color: MyColor.white,
     fontSize: 18.0,
+  );
+  final TextStyle textStyleLabel = GoogleFonts.bebasNeue(
+    color: Color(0xFFE65100),
+    fontSize: 20.0,
   );
 
   final TextStyle textStyleDrawLine = GoogleFonts.nunito(
@@ -78,6 +86,7 @@ class MyStatePaint extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // print('access paint $index');
     canvas.translate(xShift, yShift);
     // draw title if not null
     if (title != null) _drawTitle(canvas, title);
@@ -85,8 +94,19 @@ class MyStatePaint extends CustomPainter {
     _drawLines(canvas);
     // we draw the rectangles
     for (int i = 0; i < currentState.length; i++) {
-      _drawRectangle(currentState[i], canvas);
+      _drawRectangle(
+            Rectangle(
+                position: currentState[i].position,
+                length: currentState[i].length,
+                color: i==index? MyColor.green_araconda : MyColor.orang3,
+                value: currentState[i].value,
+                maxValue: maxValue,
+                label: currentState[i].label,
+                stateLabel: currentState[i].stateLabel),
+            canvas);
+     
     }
+
     // draw current state label
     String stateLabel = currentState[0].stateLabel;
 
@@ -109,7 +129,7 @@ class MyStatePaint extends CustomPainter {
     );
     double x = totalWidth;
     double y = rectHeight * numberOfRactanglesToShow;
-    print(y);
+    // print(y);
     canvas.save();
     textPainter.layout();
     canvas.translate(x, y);
@@ -172,8 +192,8 @@ class MyStatePaint extends CustomPainter {
       value = value.substring(0, 5) + "..";
     }
     textPainter.text = TextSpan(
-      text: value,
-      style: textStyle,
+      text: '\$ ${formatNumber(int.parse(value))}',
+      style: textStyleLabel,
     );
     canvas.save();
     textPainter.layout();
@@ -189,8 +209,8 @@ class MyStatePaint extends CustomPainter {
 
     // draw the title for each rectangle
     String label = rect.label;
-    if (label.length > 9) {
-      label = label.substring(0, 7) + "..";
+    if (label.length > 11) {
+      label = label.substring(0, 9) + "..";
     }
     textPainter.text = TextSpan(
       text: label,
@@ -198,7 +218,7 @@ class MyStatePaint extends CustomPainter {
     );
     canvas.save();
     textPainter.layout();
-    canvas.translate(0, y1 + 9);
+    canvas.translate(0 - 9, y1 + 9);
     textPainter.paint(
       canvas,
       Offset(

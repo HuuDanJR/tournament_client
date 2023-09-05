@@ -1,6 +1,8 @@
 library bar_chart_race;
 
 import "package:flutter/material.dart";
+import 'package:get/get.dart';
+import 'package:tournament_client/lib/getx/controller.get.dart';
 import 'package:tournament_client/utils/mycolors.dart';
 import 'dart:math' as math;
 import 'models/rectangle.dart';
@@ -53,7 +55,7 @@ class BarChartRace extends StatefulWidget {
   /// for example if you are studying countries, you can assign to each country a color
   /// colors should be ordred as the column in the [data]
   /// by default it uses random colors
-  final List<Color> columnsColor;
+  final List<Color>? columnsColor;
 
   /// represent the title of the chart
   final String title;
@@ -63,10 +65,14 @@ class BarChartRace extends StatefulWidget {
 
   /// the height of the rectangle
   final double rectangleHeight;
+  final int index;
+  final int? selectedIndex;
 
   const BarChartRace({
     Key? key,
     required this.data,
+    this.selectedIndex,
+    required this.index,
     required this.initialPlayState,
     this.framesPerSecond = 25,
     this.framesBetweenTwoStates = 40,
@@ -74,7 +80,7 @@ class BarChartRace extends StatefulWidget {
     this.numberOfRactanglesToShow = 5,
     required this.columnsLabel,
     required this.statesLabel,
-    required this.columnsColor,
+    this.columnsColor,
     required this.title,
     required this.titleTextStyle,
   }) : super(key: key);
@@ -90,7 +96,10 @@ class _BarChartRaceState extends State<BarChartRace> {
   List<List<Rectangle>>? preparedData;
   // current data to show
   List<Rectangle>? currentData;
+
+  //addtion from Dan
   TextEditingController? controller = TextEditingController();
+  final controllerGetX = Get.put(MyGetXController());
 
   @override
   void initState() {
@@ -126,78 +135,86 @@ class _BarChartRaceState extends State<BarChartRace> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
-        body: Center(
-      child: Stack(
+      body: Stack(
         children: [
-          Positioned(
-              bottom: 24,
-              right: 24,
-              child: Text('YOU ARE PLAYER 05',
-                  style: TextStyle(
-                    color: MyColor.black_text,
-                    fontSize: 24,
-                  ))),
-          Positioned(
-              top: 12,
-              left: 24,
-              child: Container(
-                alignment: Alignment.center,
-                width: 135,
-                height: 55,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('asset/image/logo_renew.png'),
-                        fit: BoxFit.contain)),
-              )),
-          Positioned(
-              top: 12,
-              right: 24,
-              child: GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                10.0), // Set border radius
-                          ),
-                          title: Text('Player Setting'),
-                          content: TextField(
-                            controller: controller,
-                            decoration: const InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                              hintText: 'Enter player number ( 1-10 )',
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Confirm'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Close the dialog
-                              },
-                              child: Text('Close'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  child: Icon(
-                    Icons.settings_rounded,
-                    color: MyColor.grey,
-                    size: 34,
-                  ))),
+          // Positioned(
+          //     top: 12,
+          //     right: 12,
+          //     child: GestureDetector(
+          //         onTap: () {
+          //           showDialog(
+          //             context: context,
+          //             builder: (BuildContext context) {
+          //               return AlertDialog(
+          //                 backgroundColor: Colors.white,
+          //                 shape: RoundedRectangleBorder(
+          //                   borderRadius: BorderRadius.circular(
+          //                       10.0), // Set border radius
+          //                 ),
+          //                 title: Text('Player Setting'),
+          //                 content: TextField(
+          //                   controller: controller,
+          //                   keyboardType: TextInputType.number,
+          //                   decoration: const InputDecoration(
+          //                     contentPadding:
+          //                         const EdgeInsets.symmetric(horizontal: 4.0),
+          //                     hintText: 'Enter player number ( 1-10 )',
+          //                   ),
+          //                 ),
+          //                 actions: [
+          //                   TextButton(
+          //                     onPressed: () {
+          //                       if (controller!.text.isNum) {
+          //                         if (int.tryParse(controller!.text) != null) {
+          //                           int number = int.parse(controller!.text);
+          //                           if (number >= 1 && number <= 10) {
+          //                             // The text is a valid number within the range 1-10
+          //                             controllerGetX.savePlayerNumber(number);
+          //                           }
+          //                         }
+          //                       }
+          //                       Navigator.of(context).pop();
+          //                     },
+          //                     child: Text('Confirm'),
+          //                   ),
+          //                   TextButton(
+          //                     onPressed: () {
+          //                       Navigator.of(context).pop(); // Close the dialog
+          //                     },
+          //                     child: Text('Close'),
+          //                   ),
+          //                 ],
+          //               );
+          //             },
+          //           );
+          //         },
+          //         child: Icon(
+          //           Icons.settings_rounded,
+          //           color: MyColor.grey,
+          //           size: 34,
+          //         ))),
           Container(
             height: height,
             width: width,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black,
+                  Colors.black87,
+                ],
+                stops: [
+                  0.0,
+                  0.75,
+                ], // Adjust the stops to control the gradient effect
+              ),
+              // image: DecorationImage(
+              //   filterQuality: FilterQuality.low,
+              //   image: AssetImage('asset/image/background.png'),
+              //   fit: BoxFit.cover, // Make the image cover the entire container
+              // ),
+            ),
             padding: const EdgeInsets.symmetric(
               horizontal: 64,
               vertical: 64,
@@ -205,6 +222,7 @@ class _BarChartRaceState extends State<BarChartRace> {
             child: LayoutBuilder(
               builder: (_, constraints) => CustomPaint(
                 painter: MyStatePaint(
+                  index: widget.index,
                   currentState: currentData!,
                   numberOfRactanglesToShow: widget.numberOfRactanglesToShow,
                   rectHeight: widget.rectangleHeight,
@@ -217,9 +235,37 @@ class _BarChartRaceState extends State<BarChartRace> {
               ),
             ),
           ),
+          Positioned(
+              bottom: 24,
+              right: 24,
+              child: Text('YOU ARE PLAYER ${widget.selectedIndex}',
+                  style: TextStyle(
+                    color: MyColor.white,
+                    fontSize: 24,
+                  )
+                  // GetBuilder<MyGetXController>(
+                  //   builder: (controller) =>
+                  //       Text('YOU ARE PLAYER ${controller.playerNumber.value}',
+                  //           style: TextStyle(
+                  //             color: MyColor.black_text,
+                  //             fontSize: 24,
+                  //           )),
+                  )),
+          Positioned(
+              top: 12,
+              left: 12,
+              child: Container(
+                alignment: Alignment.center,
+                width: 135,
+                height: 55,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('asset/image/logo_new.png'),
+                        fit: BoxFit.contain)),
+              )),
         ],
       ),
-    ));
+    );
   }
 
   void play() async {
@@ -281,12 +327,22 @@ class _BarChartRaceState extends State<BarChartRace> {
           length: 0,
           position: 0,
           value: 0,
-          color: Colors.black,
+          color: MyColor.blue,
           stateLabel: '',
           label: '',
         ),
       );
-
+// currentState[widget.index] = Rectangle(
+//           maxValue: maxValue,
+//           length: data[i][widget.index] / maxValue,
+//           position: 1.0 * widget.index,
+//           value: data[i][widget.index],
+//           color: widget.columnsColor == null
+//               ? Colors.green
+//               : widget.columnsColor![widget.index],
+//           stateLabel: widget.statesLabel[i],
+//           label: widget.columnsLabel[widget.index],
+//         );
       for (int j = 0; j < nbParticipants!; j++) {
         int index = indexes[j];
         // generate a random color to use in case the colors are not provided
@@ -300,8 +356,10 @@ class _BarChartRaceState extends State<BarChartRace> {
           position: 1.0 * j,
           value: data[i][index],
           color: widget.columnsColor == null
-              ? randomColor
-              : widget.columnsColor[index],
+              ? index != widget.index
+                  ? MyColor.orang3
+                  : MyColor.green_araconda
+              : widget.columnsColor![index],
           stateLabel: widget.statesLabel[i],
           label: widget.columnsLabel[index],
         );

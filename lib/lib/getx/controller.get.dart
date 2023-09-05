@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-class MyController extends GetxController {
+class MyGetXController extends GetxController {
   @override
   void onInit() {
     super.onInit();
@@ -11,9 +11,13 @@ class MyController extends GetxController {
     super.onClose();
   }
 
-  RxString playerNumber = ''.obs;
+  RxInt playerNumber = 1.obs;
 
-  savePlayerNumber(){
-    
+  savePlayerNumber(number) {
+    playerNumber.value = number;
+  }
+
+  resetPlayerNumber() {
+    playerNumber.value = 1;
   }
 }

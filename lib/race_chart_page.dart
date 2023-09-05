@@ -78,6 +78,7 @@ class _BarCharRaceState extends State<BarCharRace> {
             // )
             BarChartRace(
       data: data!,
+      index: 1,
       initialPlayState: true,
       columnsColor: [
         Color(0xFFFF9900),
@@ -87,6 +88,7 @@ class _BarCharRaceState extends State<BarCharRace> {
         Color(0xFF212326),
         MyColor.bedge,
         MyColor.pinkMain,
+        
         MyColor.green_araconda,
         MyColor.red_accent,
         MyColor.yellow_accent,
