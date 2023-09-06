@@ -13,10 +13,15 @@ import 'package:tournament_client/utils/mycolors.dart';
 import 'package:tournament_client/widget/snackbar.custom.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key, required this.title, required this.selectedIndex});
+  MyHomePage(
+      {super.key,
+      required this.url,
+      required this.title,
+      required this.selectedIndex});
 
   final String title;
   int? selectedIndex;
+  final String url;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -24,7 +29,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   IO.Socket? socket;
-  StreamController<List<Map<String, dynamic>>> _streamController = StreamController<List<Map<String, dynamic>>>.broadcast();
+  StreamController<List<Map<String, dynamic>>> _streamController =
+      StreamController<List<Map<String, dynamic>>>.broadcast();
   List<Map<String, dynamic>> stationData = [];
   Map<String, AnimationController> _animationControllers = {};
   final controllerGetX = Get.put(MyGetXController());
@@ -32,14 +38,14 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    socket = IO.io('http://localhost:8090', <String, dynamic>{
+    socket = IO.io('${widget.url}', <String, dynamic>{
       'transports': ['websocket'],
     });
     socket!.onConnect((_) {
-      print('Connected to server');
+      print('Connected to server APP');
     });
     socket!.onDisconnect((_) {
-      print('Disconnected from server');
+      print('Disconnected from server APP');
     });
     // socket!.on('eventFromServer', (data) {
     //   List<Map<String, dynamic>> stationData = List<Map<String, dynamic>>.from(data);
@@ -58,13 +64,14 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             }
             stationData.add(doubleList);
-            print('stationData_: ${stationData}');
+            // print('stationData_: ${stationData}');
           }
         }
 
         List<Map<String, dynamic>> formattedData = stationData.map((list) {
           return {'data': List<double>.from(list)};
         }).toList();
+        // print('formatData in home: $formattedData');
 
         _streamController.add(formattedData);
         final finalData = formattedData.map<List<double>>((dataMap) {
@@ -120,76 +127,103 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: StreamBuilder<List<Map<String, dynamic>>>(
-          stream: _streamController.stream,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final stationDataList = snapshot.data!;
-              final formattedData =
-                  stationDataList.map<List<double>>((dataMap) {
-                if (dataMap['data'] is List<double>) {
-                  final dataList = dataMap['data'] as List<double>;
-                  return dataList;
-                }
-                return [];
-              }).toList();
-              if (snapshot.data!.isEmpty ||
-                  snapshot.data == null ||
-                  snapshot.data == []) {
-                return const Text('empty data');
+        body: SafeArea(
+      child: StreamBuilder<List<Map<String, dynamic>>>(
+        stream: _streamController.stream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final stationDataList = snapshot.data!;
+            final formattedData = stationDataList.map<List<double>>((dataMap) {
+              if (dataMap['data'] is List<double>) {
+                final dataList = dataMap['data'] as List<double>;
+                return dataList;
               }
+              return [];
+            }).toList();
+            if (snapshot.data!.isEmpty ||
+                snapshot.data == null ||
+                snapshot.data == []) {
+              return const Text('empty data');
+            }
 
-              return ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(
-                  physics: const BouncingScrollPhysics(),
-                  dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
-                    PointerDeviceKind.trackpad,
-                  },
-                ),
-                child: RefreshIndicator(
-                    onRefresh: _refresh,
-                    child: BarChartRace(
-                      selectedIndex: widget.selectedIndex,
-                      // index: 1,
-                      // index: selectedIndex,
-                      index: detect(widget.selectedIndex!.toDouble(), formattedData[0]),
-                      data: convertData(formattedData),
-                      initialPlayState: true,
-                      // columnsColor: changeList(detect(1, formattedData[0])),
-                      // columnsColor: colorList,
-                      // columnsColor: shuffleColorList(),
-                      framesPerSecond: 90,
-                      framesBetweenTwoStates: 90,
-                      numberOfRactanglesToShow: formattedData[0].length,
-                      title: "DYNAMIC RANKING",
-                      columnsLabel: formattedData[0]
-                          .map((value) =>
-                              'PLAYER ${value < 10 ? '0$value' : value.toStringAsFixed(0)}')
-                          .toList(),
-                      statesLabel: List.generate(
-                        30,
-                        (index) => formatDate(
-                          DateTime.now().add(
-                            Duration(days: index),
+            return ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                physics: const BouncingScrollPhysics(),
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.trackpad,
+                },
+              ),
+              child: RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: Stack(
+                    children: [
+                     
+                      BarChartRace(
+                        selectedIndex: widget.selectedIndex,
+                        // index: 1,
+                        // index: selectedIndex,
+                        index: detect(
+                            widget.selectedIndex!.toDouble(), formattedData[0]),
+                        data: convertData(formattedData),
+                        initialPlayState: true,
+                        // columnsColor: changeList(detect(1, formattedData[0])),
+                        // columnsColor: colorList,
+                        // columnsColor: shuffleColorList(),
+                        framesPerSecond: 90,
+                        framesBetweenTwoStates: 90,
+                        numberOfRactanglesToShow: formattedData[0].length,
+                        title: "DYNAMIC RANKING",
+                        columnsLabel: formattedData[0]
+                            .map((value) =>
+                                'PLAYER ${value < 10 ? '0$value' : value.toStringAsFixed(0)}')
+                            .toList(),
+                        statesLabel: List.generate(
+                          30,
+                          (index) => formatDate(
+                            DateTime.now().add(
+                              Duration(days: index),
+                            ),
                           ),
                         ),
+                        titleTextStyle: GoogleFonts.nunitoSans(
+                          color: Colors.white,
+                          fontSize: 32,
+                        ),
                       ),
-                      titleTextStyle: GoogleFonts.nunitoSans(
-                        color: Colors.white,
-                        fontSize: 32,
-                      ),
-                    )),
-              );
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
-        ),)
+                       Positioned(
+                          bottom: 24,
+                          right: 24,
+                          child: Text('YOU ARE PLAYER ${widget.selectedIndex}',
+                              style: TextStyle(
+                                color: MyColor.white,
+                                fontSize: 24,
+                              ))),
+                      Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: 135,
+                            height: 55,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image:
+                                        AssetImage('asset/image/logo_new.png'),
+                                    fit: BoxFit.contain)),
+                          )),
+                    ],
+                  )),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+    )
         // barcharcustom(formattedData)
         // BarCharRace(data: formattedData,)
         // StreamBuilder<List<Map<String, dynamic>>>(
@@ -218,16 +252,19 @@ class _MyHomePageState extends State<MyHomePage> {
         //     }
         //   },
         // ),
-    );
+        );
   }
 }
 
 List<List<double>> convertData(data) {
   if (data.length == 2) {
+    // print('convert data 2 : $data ');
     return [data.last];
   } else if (data.length == 3) {
+    // print('convert data 3: $data ');
     return [data[1], data.last];
   }
+  // print('convert data : $data ');
   return data;
 }
 
@@ -268,7 +305,7 @@ List<Color> changeList(int index) {
 int detect(double targetIndex, List<double> myList) {
   for (int i = 0; i < myList.length; i++) {
     if (myList[i] == targetIndex) {
-      print('index $i');
+      // print('index $i');
       return i;
     }
   }

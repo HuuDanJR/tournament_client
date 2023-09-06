@@ -6,6 +6,12 @@ import 'package:dio/dio.dart';
 
 class ServiceAPIs {
   Dio dio = Dio();
+
+
+Future fetchInit() async {
+
+}
+
  Future<List<List<double>>> fetchData() async {
   final response = await http.get(Uri.parse('http://localhost:8090/api/finddata/'));
   if (response.statusCode == 200) {

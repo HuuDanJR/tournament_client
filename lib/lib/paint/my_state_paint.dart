@@ -50,7 +50,7 @@ class MyStatePaint extends CustomPainter {
     maxLength = totalWidth * 0.9;
   }
 
-  final double spaceBetweenTwoRectangles = 16;
+  final double spaceBetweenTwoRectangles = 28;
   final double yShift = 50;
   final double xShift = 70;
   // define text painter to paint text (write text)
@@ -60,11 +60,11 @@ class MyStatePaint extends CustomPainter {
   );
   final TextStyle textStyle = GoogleFonts.bebasNeue(
     color: MyColor.white,
-    fontSize: 18.0,
+    fontSize: 22.0,
   );
   final TextStyle textStyleLabel = GoogleFonts.bebasNeue(
     color: Color(0xFFE65100),
-    fontSize: 20.0,
+    fontSize: 22.0,
   );
 
   final TextStyle textStyleDrawLine = GoogleFonts.nunito(
@@ -103,7 +103,8 @@ class MyStatePaint extends CustomPainter {
                 maxValue: maxValue,
                 label: currentState[i].label,
                 stateLabel: currentState[i].stateLabel),
-            canvas);
+                canvas
+      );
      
     }
 
@@ -167,12 +168,10 @@ class MyStatePaint extends CustomPainter {
   void _drawRectangle(Rectangle rect, Canvas canvas) {
     // draw rectangle
     Path path = Path();
-    double maxHeight =
-        numberOfRactanglesToShow * (rectHeight + spaceBetweenTwoRectangles) -
+    double maxHeight = numberOfRactanglesToShow * (rectHeight + spaceBetweenTwoRectangles) -
             spaceBetweenTwoRectangles;
     // define postitons of the four corner to draw the rectangle
-    double x1 = 0,
-        y1 = rect.position * (rectHeight + spaceBetweenTwoRectangles);
+    double x1 = 0,y1 = rect.position * (rectHeight + spaceBetweenTwoRectangles);
     // if the rectancles if outside, we don't draw it
     if (y1 >= maxHeight) return;
     // min is to draw a rectangle partially, (in case it's showning up or hiding)
@@ -192,7 +191,7 @@ class MyStatePaint extends CustomPainter {
       value = value.substring(0, 5) + "..";
     }
     textPainter.text = TextSpan(
-      text: '\$ ${formatNumber(int.parse(value))}',
+      text: '\$${(double.parse(value))}',
       style: textStyleLabel,
     );
     canvas.save();

@@ -135,65 +135,8 @@ class _BarChartRaceState extends State<BarChartRace> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Stack(
-        children: [
-          // Positioned(
-          //     top: 12,
-          //     right: 12,
-          //     child: GestureDetector(
-          //         onTap: () {
-          //           showDialog(
-          //             context: context,
-          //             builder: (BuildContext context) {
-          //               return AlertDialog(
-          //                 backgroundColor: Colors.white,
-          //                 shape: RoundedRectangleBorder(
-          //                   borderRadius: BorderRadius.circular(
-          //                       10.0), // Set border radius
-          //                 ),
-          //                 title: Text('Player Setting'),
-          //                 content: TextField(
-          //                   controller: controller,
-          //                   keyboardType: TextInputType.number,
-          //                   decoration: const InputDecoration(
-          //                     contentPadding:
-          //                         const EdgeInsets.symmetric(horizontal: 4.0),
-          //                     hintText: 'Enter player number ( 1-10 )',
-          //                   ),
-          //                 ),
-          //                 actions: [
-          //                   TextButton(
-          //                     onPressed: () {
-          //                       if (controller!.text.isNum) {
-          //                         if (int.tryParse(controller!.text) != null) {
-          //                           int number = int.parse(controller!.text);
-          //                           if (number >= 1 && number <= 10) {
-          //                             // The text is a valid number within the range 1-10
-          //                             controllerGetX.savePlayerNumber(number);
-          //                           }
-          //                         }
-          //                       }
-          //                       Navigator.of(context).pop();
-          //                     },
-          //                     child: Text('Confirm'),
-          //                   ),
-          //                   TextButton(
-          //                     onPressed: () {
-          //                       Navigator.of(context).pop(); // Close the dialog
-          //                     },
-          //                     child: Text('Close'),
-          //                   ),
-          //                 ],
-          //               );
-          //             },
-          //           );
-          //         },
-          //         child: Icon(
-          //           Icons.settings_rounded,
-          //           color: MyColor.grey,
-          //           size: 34,
-          //         ))),
-          Container(
+      body:
+      Container(
             height: height,
             width: width,
             decoration: BoxDecoration(
@@ -216,8 +159,8 @@ class _BarChartRaceState extends State<BarChartRace> {
               // ),
             ),
             padding: const EdgeInsets.symmetric(
-              horizontal: 64,
-              vertical: 64,
+              horizontal: 84,
+              vertical: 84,
             ),
             child: LayoutBuilder(
               builder: (_, constraints) => CustomPaint(
@@ -226,6 +169,7 @@ class _BarChartRaceState extends State<BarChartRace> {
                   currentState: currentData!,
                   numberOfRactanglesToShow: widget.numberOfRactanglesToShow,
                   rectHeight: widget.rectangleHeight,
+                  // rectHeight: 42.5,
                   maxValue: currentData![0].maxValue,
                   totalWidth: constraints.maxWidth * .9,
                   title: widget.title,
@@ -235,36 +179,139 @@ class _BarChartRaceState extends State<BarChartRace> {
               ),
             ),
           ),
-          Positioned(
-              bottom: 24,
-              right: 24,
-              child: Text('YOU ARE PLAYER ${widget.selectedIndex}',
-                  style: TextStyle(
-                    color: MyColor.white,
-                    fontSize: 24,
-                  )
-                  // GetBuilder<MyGetXController>(
-                  //   builder: (controller) =>
-                  //       Text('YOU ARE PLAYER ${controller.playerNumber.value}',
-                  //           style: TextStyle(
-                  //             color: MyColor.black_text,
-                  //             fontSize: 24,
-                  //           )),
-                  )),
-          Positioned(
-              top: 12,
-              left: 12,
-              child: Container(
-                alignment: Alignment.center,
-                width: 135,
-                height: 55,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('asset/image/logo_new.png'),
-                        fit: BoxFit.contain)),
-              )),
-        ],
-      ),
+      
+      //  Stack(
+      //   alignment: Alignment.center,
+      //   children: [
+      //     // Positioned(
+      //     //     top: 12,
+      //     //     right: 12,
+      //     //     child: GestureDetector(
+      //     //         onTap: () {
+      //     //           showDialog(
+      //     //             context: context,
+      //     //             builder: (BuildContext context) {
+      //     //               return AlertDialog(
+      //     //                 backgroundColor: Colors.white,
+      //     //                 shape: RoundedRectangleBorder(
+      //     //                   borderRadius: BorderRadius.circular(
+      //     //                       10.0), // Set border radius
+      //     //                 ),
+      //     //                 title: Text('Player Setting'),
+      //     //                 content: TextField(
+      //     //                   controller: controller,
+      //     //                   keyboardType: TextInputType.number,
+      //     //                   decoration: const InputDecoration(
+      //     //                     contentPadding:
+      //     //                         const EdgeInsets.symmetric(horizontal: 4.0),
+      //     //                     hintText: 'Enter player number ( 1-10 )',
+      //     //                   ),
+      //     //                 ),
+      //     //                 actions: [
+      //     //                   TextButton(
+      //     //                     onPressed: () {
+      //     //                       if (controller!.text.isNum) {
+      //     //                         if (int.tryParse(controller!.text) != null) {
+      //     //                           int number = int.parse(controller!.text);
+      //     //                           if (number >= 1 && number <= 10) {
+      //     //                             // The text is a valid number within the range 1-10
+      //     //                             controllerGetX.savePlayerNumber(number);
+      //     //                           }
+      //     //                         }
+      //     //                       }
+      //     //                       Navigator.of(context).pop();
+      //     //                     },
+      //     //                     child: Text('Confirm'),
+      //     //                   ),
+      //     //                   TextButton(
+      //     //                     onPressed: () {
+      //     //                       Navigator.of(context).pop(); // Close the dialog
+      //     //                     },
+      //     //                     child: Text('Close'),
+      //     //                   ),
+      //     //                 ],
+      //     //               );
+      //     //             },
+      //     //           );
+      //     //         },
+      //     //         child: Icon(
+      //     //           Icons.settings_rounded,
+      //     //           color: MyColor.grey,
+      //     //           size: 34,
+      //     //         ))),
+      //     Container(
+      //       height: height,
+      //       width: width,
+      //       decoration: BoxDecoration(
+      //         gradient: LinearGradient(
+      //           begin: Alignment.topCenter,
+      //           end: Alignment.bottomCenter,
+      //           colors: [
+      //             Colors.black,
+      //             Colors.black87,
+      //           ],
+      //           stops: [
+      //             0.0,
+      //             0.75,
+      //           ], // Adjust the stops to control the gradient effect
+      //         ),
+      //         // image: DecorationImage(
+      //         //   filterQuality: FilterQuality.low,
+      //         //   image: AssetImage('asset/image/background.png'),
+      //         //   fit: BoxFit.cover, // Make the image cover the entire container
+      //         // ),
+      //       ),
+      //       padding: const EdgeInsets.symmetric(
+      //         horizontal: 84,
+      //         vertical: 84,
+      //       ),
+      //       child: LayoutBuilder(
+      //         builder: (_, constraints) => CustomPaint(
+      //           painter: MyStatePaint(
+      //             index: widget.index,
+      //             currentState: currentData!,
+      //             numberOfRactanglesToShow: widget.numberOfRactanglesToShow,
+      //             // rectHeight: widget.rectangleHeight,
+      //             rectHeight: 42.5,
+      //             maxValue: currentData![0].maxValue,
+      //             totalWidth: constraints.maxWidth * .9,
+      //             title: widget.title,
+      //             titleTextStyle: widget.titleTextStyle,
+      //             maxLength: null,
+      //           ),
+      //         ),
+      //       ),
+      //     ),
+      //     Positioned(
+      //         bottom: 24,
+      //         right: 24,
+      //         child: Text('YOU ARE PLAYER ${widget.selectedIndex}',
+      //             style: TextStyle(
+      //               color: MyColor.white,
+      //               fontSize: 24,
+      //             )
+      //             // GetBuilder<MyGetXController>(
+      //             //   builder: (controller) =>
+      //             //       Text('YOU ARE PLAYER ${controller.playerNumber.value}',
+      //             //           style: TextStyle(
+      //             //             color: MyColor.black_text,
+      //             //             fontSize: 24,
+      //             //           )),
+      //             )),
+      //     Positioned(
+      //         top: 12,
+      //         left: 12,
+      //         child: Container(
+      //           alignment: Alignment.center,
+      //           width: 135,
+      //           height: 55,
+      //           decoration: BoxDecoration(
+      //               image: DecorationImage(
+      //                   image: AssetImage('asset/image/logo_new.png'),
+      //                   fit: BoxFit.contain)),
+      //         )),
+      //   ],
+      // ),
     );
   }
 

@@ -8,9 +8,17 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController controller = TextEditingController(text: '');
+  final TextEditingController controllerUrl =
+      TextEditingController(text: 'http://localhost:8090');
   bool isDialogVisible = true;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    controllerUrl.text = 'http://localhost:8090';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,41 +27,41 @@ class _WelcomePageState extends State<WelcomePage> {
 
     return Scaffold(
       body: Container(
-        height:height,
-        width:width,
+        height: height,
+        width: width,
         decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black,
-                  Colors.black87,
-                ],
-                stops: [
-                  0.0,
-                  0.75,
-                ], // Adjust the stops to control the gradient effect
-              ),
-              // image: DecorationImage(
-              //   filterQuality: FilterQuality.low,
-              //   image: AssetImage('asset/image/background.png'),
-              //   fit: BoxFit.cover, // Make the image cover the entire container
-              // ),
-            ),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black,
+              Colors.black87,
+            ],
+            stops: [
+              0.0,
+              0.75,
+            ], // Adjust the stops to control the gradient effect
+          ),
+          // image: DecorationImage(
+          //   filterQuality: FilterQuality.low,
+          //   image: AssetImage('asset/image/background.png'),
+          //   fit: BoxFit.cover, // Make the image cover the entire container
+          // ),
+        ),
         child: Stack(
           children: [
             Positioned(
-              top: 12,
-              left: 12,
-              child: Container(
-                alignment: Alignment.center,
-                width: 135,
-                height: 55,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('asset/image/logo_new.png'),
-                        fit: BoxFit.contain)),
-              )),
+                top: 12,
+                left: 12,
+                child: Container(
+                  alignment: Alignment.center,
+                  width: 135,
+                  height: 55,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('asset/image/logo_new.png'),
+                          fit: BoxFit.contain)),
+                )),
             // MyHomePage(title: 'tournament page',selectedIndex: 0,),
             if (isDialogVisible)
               AlertDialog(
@@ -63,17 +71,33 @@ class _WelcomePageState extends State<WelcomePage> {
                       BorderRadius.circular(10.0), // Set border radius
                 ),
                 title: Text('Player Setting'),
-                content: TextField(
-                  controller: controller,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    hintText: 'Enter player number (1-10)',
-                  ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 4.0),
+                        hintText: 'Enter player number (1-10)',
+                      ),
+                    ),
+                    TextField(
+                      controller: controllerUrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 4.0),
+                        hintText: 'Enter host',
+                      ),
+                    ),
+                  ],
                 ),
                 actions: [
                   TextButton(
                     onPressed: () {
+                      
                       if (controller.text.isNotEmpty) {
                         int? number = int.tryParse(controller.text);
                         if (number != null && number >= 1 && number <= 10) {
@@ -95,6 +119,7 @@ class _WelcomePageState extends State<WelcomePage> {
                           // Do something with the number here
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (_) => MyHomePage(
+                                  url: "${controllerUrl.text}",
                                   title: 'Tournament Client',
                                   selectedIndex: int.parse(controller.text))));
                         } else {
