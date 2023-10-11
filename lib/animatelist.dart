@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart'; // Import the collection package
 
-import 'package:collection/collection.dart'; // Import the collection package
+// Import the collection package
 
 class AnimatedListView extends StatefulWidget {
   final List<Map<String, dynamic>> data;
 
-  AnimatedListView({required this.data});
+  const AnimatedListView({super.key, required this.data});
 
   @override
   _AnimatedListViewState createState() => _AnimatedListViewState();
@@ -24,7 +24,7 @@ class _AnimatedListViewState extends State<AnimatedListView> {
 
   @override
   void didUpdateWidget(covariant AnimatedListView oldWidget) {
-    if (!DeepCollectionEquality().equals(widget.data, _animatedData)) {
+    if (!const DeepCollectionEquality().equals(widget.data, _animatedData)) {
       _updateList();
     }
     super.didUpdateWidget(oldWidget);
@@ -74,7 +74,7 @@ class _AnimatedListViewState extends State<AnimatedListView> {
       sizeFactor: animation,
       child: Card(
         child: ListTile(
-          leading: Icon(Icons.star, color: Colors.redAccent),
+          leading: const Icon(Icons.star, color: Colors.redAccent),
           title: Text('Member: ${item['member']}'),
           subtitle: Text('credit: ${item['credit']}'),
         ),
@@ -85,7 +85,7 @@ class _AnimatedListViewState extends State<AnimatedListView> {
   @override
   Widget build(BuildContext context) {
     return AnimatedList(
-      padding: EdgeInsets.all(32),
+      padding: const EdgeInsets.all(32),
       key: _listKey,
       physics: const BouncingScrollPhysics(),
       initialItemCount: _animatedData.length,

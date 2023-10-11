@@ -11,8 +11,8 @@ Widget listview(stationData) {
       return Card(
         child: ListTile(
           leading: index == 1 || index == 2 || index == 0
-              ? Icon(Icons.star, color: Colors.redAccent)
-              : Container(
+              ? const Icon(Icons.star, color: Colors.redAccent)
+              : const SizedBox(
                   width: 1,
                   height: 1,
                 ),

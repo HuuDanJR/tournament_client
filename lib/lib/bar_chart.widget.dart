@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:tournament_client/lib/bar_chart_race.dart';
 import 'package:tournament_client/utils/mycolors.dart';
-import 'package:tournament_client/race_chart_page.dart';
 
 Widget barcharcustom(data) {
   return BarChartRace(
     data: data,
     index: 1,
+    rectangleHeight: 45,
+    selectedIndex: 1,
     initialPlayState: true,
-    columnsColor: [
+    columnsColor: const [
       Color(0xFFFF9900),
       MyColor.blue_coinbase,
       Color(0xFFA2AAAD),
@@ -24,7 +25,7 @@ Widget barcharcustom(data) {
     framesBetweenTwoStates: 30,
     numberOfRactanglesToShow: 10,
     title: "RANKING TOURNAMENT",
-    columnsLabel: [
+    columnsLabel: const [
       "Amazon",
       "Google",
       "Apple",
@@ -45,7 +46,7 @@ Widget barcharcustom(data) {
       ),
     ),
     
-    titleTextStyle: TextStyle(
+    titleTextStyle: const TextStyle(
       color: Colors.black,
       fontSize: 24,
     ),

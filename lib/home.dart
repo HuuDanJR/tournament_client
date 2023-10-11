@@ -11,13 +11,16 @@ import 'package:tournament_client/lib/bar_chart_race.dart';
 import 'package:tournament_client/lib/getx/controller.get.dart';
 import 'package:tournament_client/utils/mycolors.dart';
 import 'package:tournament_client/widget/snackbar.custom.dart';
+import 'dart:math' as math;
 
 class MyHomePage extends StatefulWidget {
   MyHomePage(
       {super.key,
       required this.url,
+      required this.selectedIndex,
       required this.title,
-      required this.selectedIndex});
+      }
+  );
 
   final String title;
   int? selectedIndex;
@@ -29,16 +32,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   IO.Socket? socket;
-  StreamController<List<Map<String, dynamic>>> _streamController =
+  final StreamController<List<Map<String, dynamic>>> _streamController =
       StreamController<List<Map<String, dynamic>>>.broadcast();
   List<Map<String, dynamic>> stationData = [];
-  Map<String, AnimationController> _animationControllers = {};
+  final Map<String, AnimationController> _animationControllers = {};
   final controllerGetX = Get.put(MyGetXController());
 
   @override
   void initState() {
+    //gerenate data
+    // generateGoodRandomData(3, 10);
+    // generateGoodRandomData2(3, 10);
+
     super.initState();
-    socket = IO.io('${widget.url}', <String, dynamic>{
+    socket = IO.io(widget.url, <String, dynamic>{
       'transports': ['websocket'],
     });
     socket!.onConnect((_) {
@@ -93,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _delete(int stationId) {
     socket!.emit('eventFromClientDelete', {'stationId': stationId});
-    String message = 'Data deleted with stationId ${stationId}';
+    String message = 'Data deleted with stationId $stationId';
     snackbar_custom(context: context, text: message);
   }
 
@@ -120,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  Future<Null> _refresh() async {
+  Future<void> _refresh() async {
     socket!.emit('eventFromClient');
   }
 
@@ -159,7 +166,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   onRefresh: _refresh,
                   child: Stack(
                     children: [
-                     
                       BarChartRace(
                         selectedIndex: widget.selectedIndex,
                         // index: 1,
@@ -167,14 +173,27 @@ class _MyHomePageState extends State<MyHomePage> {
                         index: detect(
                             widget.selectedIndex!.toDouble(), formattedData[0]),
                         data: convertData(formattedData),
+                        // data: generateGoodRandomData2(2, 6),
                         initialPlayState: true,
                         // columnsColor: changeList(detect(1, formattedData[0])),
                         // columnsColor: colorList,
                         // columnsColor: shuffleColorList(),
-                        framesPerSecond: 90,
-                        framesBetweenTwoStates: 90,
+                        framesPerSecond: 40,
+                        framesBetweenTwoStates: 40,
                         numberOfRactanglesToShow: formattedData[0].length,
                         title: "DYNAMIC RANKING",
+                        // columnsLabel: [
+                        //   "1232123132141",
+                        //   "3123",
+                        //   "Apple213",
+                        //   "Coca123",
+                        //   "Huawei123",
+                        //   "Sony",
+                        //   'Pepsi',
+                        //   "Samsung",
+                        //   "Netflix",
+                        //   "Facebook",
+                        // ],
                         columnsLabel: formattedData[0]
                             .map((value) =>
                                 'PLAYER ${value < 10 ? '0$value' : value.toStringAsFixed(0)}')
@@ -189,14 +208,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         titleTextStyle: GoogleFonts.nunitoSans(
                           color: Colors.white,
-                          fontSize: 32,
+                          fontSize: 36,
                         ),
                       ),
-                       Positioned(
+                      Positioned(
                           bottom: 24,
                           right: 24,
-                          child: Text('YOU ARE PLAYER ${widget.selectedIndex}',
-                              style: TextStyle(
+                          child: widget.selectedIndex==111111?Container(): Text('YOU ARE PLAYER ${widget.selectedIndex}',
+                              style: const TextStyle(
                                 color: MyColor.white,
                                 fontSize: 24,
                               ))),
@@ -207,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             alignment: Alignment.center,
                             width: 135,
                             height: 55,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 image: DecorationImage(
                                     image:
                                         AssetImage('asset/image/logo_new.png'),
@@ -264,14 +283,14 @@ List<List<double>> convertData(data) {
     // print('convert data 3: $data ');
     return [data[1], data.last];
   }
-  // print('convert data : $data ');
+  print('convert data : $data ');
   return data;
 }
 
 class FormattedDataText extends StatelessWidget {
   final List<List<double>> formattedData;
 
-  FormattedDataText({required this.formattedData});
+  const FormattedDataText({super.key, required this.formattedData});
 
   @override
   Widget build(BuildContext context) {
@@ -314,7 +333,7 @@ int detect(double targetIndex, List<double> myList) {
 
 List<Color> shuffleColorList() {
   final random = Random();
-  final sublistLength = 10;
+  const sublistLength = 10;
 
   // Make sure the sublist length doesn't exceed the length of the color list
   final shuffledList = colorList.sublist(0, sublistLength)..shuffle(random);
@@ -328,7 +347,6 @@ List<Color> shuffleColorList() {
   return newList;
 }
 
-
 // [
 //  "Amazon",
 //   "Google",
@@ -341,3 +359,47 @@ List<Color> shuffleColorList() {
 //   "Netflix",
 //   "Facebook",
 // ],
+
+List<List<double>> generateGoodRandomData(int nbRows, int nbColumns) {
+  List<List<double>> data =
+      List.generate(nbRows, (index) => List<double>.filled(nbColumns, 0));
+  for (int j = 0; j < nbColumns; j++) {
+    data[0][j] = j * 10.0;
+  }
+  for (int i = 1; i < nbRows; i++) {
+    for (int j = 0; j < nbColumns; j++) {
+      double calculatedValue = data[i - 1][j] +
+          (nbColumns - j) +
+          math.Random().nextDouble() * 20 +
+          (j == 2 ? 10 : 0);
+      data[i][j] = calculatedValue;
+      // print('calculate value: $calculatedValue');
+    }
+  }
+  // print(data);
+  return data;
+}
+
+List<List<double>> generateGoodRandomData2(int nbRows, int nbColumns) {
+  List<List<double>> data =
+      List.generate(nbRows, (index) => List<double>.filled(nbColumns, 0));
+
+  for (int j = 0; j < nbColumns; j++) {
+    data[0][j] = j * 10.0;
+  }
+
+  for (int i = 1; i < nbRows; i++) {
+    for (int j = 0; j < nbColumns; j++) {
+      double calculatedValue = data[i - 1][j] +
+          (nbColumns - j) +
+          math.Random().nextDouble() * 20 +
+          (j == 2 ? 10 : 0);
+      data[i][j] = calculatedValue;
+    }
+
+    // Shuffle the values in the current row
+    data[i].shuffle();
+  }
+  // print('data shufffe $data');
+  return data;
+}

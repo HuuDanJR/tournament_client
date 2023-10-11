@@ -8,6 +8,6 @@ import 'package:flutter/material.dart';
             elevation: 2.0,
             dismissDirection: DismissDirection.up,
             duration:  const Duration(seconds: 1),
-            content: Text('$text',style:TextStyle(color:Colors.black)),
+            content: Text('$text',style:const TextStyle(color:Colors.black)),
           ));
 }

@@ -1,13 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:tournament_client/animatelist.dart';
-import 'package:tournament_client/example.dart';
 import 'package:tournament_client/utils/mycolors.dart';
-import 'package:tournament_client/widget/listview.dart';
 import 'package:tournament_client/widget/snackbar.custom.dart';
 import 'package:tournament_client/widget/text.dart';
 
@@ -24,10 +20,10 @@ class _MyHomePage2State extends State<MyHomePage2> {
   String? url ='https://cdn.pixabay.com/photo/2023/07/10/06/13/mountain-8117525_1280.jpg';
 
   IO.Socket? socket;
-  StreamController<List<Map<String, dynamic>>> _streamController =
+  final StreamController<List<Map<String, dynamic>>> _streamController =
       StreamController<List<Map<String, dynamic>>>.broadcast();
   List<Map<String, dynamic>> stationData = [];
-  Map<String, AnimationController> _animationControllers = {};
+  final Map<String, AnimationController> _animationControllers = {};
 
   @override
   void initState() {
@@ -54,7 +50,7 @@ class _MyHomePage2State extends State<MyHomePage2> {
   void _delete(int stationId) {
     // Emit an event to the server for delete with the given stationId
     socket!.emit('eventFromClientDelete', {'stationId': stationId});
-    String message = 'Data deleted with stationId ${stationId}';
+    String message = 'Data deleted with stationId $stationId';
     snackbar_custom(context: context, text: message);
   }
 
@@ -82,7 +78,7 @@ class _MyHomePage2State extends State<MyHomePage2> {
     super.dispose();
   }
 
-  Future<Null> _refresh() async {
+  Future<void> _refresh() async {
     socket!.emit('eventFromClient');
   }
 
@@ -91,7 +87,7 @@ class _MyHomePage2State extends State<MyHomePage2> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final widthP = width - 84;
-    final double itemWidth = 65;
+    const double itemWidth = 65;
     return Scaffold(
       body: SafeArea(
           child: Padding(
@@ -272,14 +268,14 @@ class _MyHomePage2State extends State<MyHomePage2> {
         width: width ,
         alignment: Alignment.center,
         height: height,
-        child: textcustomColor( text: '$text', size:isLargeText==true? 22:16, isBold: false, color: color),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
             border: Border(
           right: BorderSide(
             color: MyColor.grey_tab, // Border color
             width: 1.0, // Border width
           ),
         )),
+        child: textcustomColor( text: '$text', size:isLargeText==true? 22:16, isBold: false, color: color),
       ),
       ]
     );

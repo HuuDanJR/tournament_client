@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ExamplePage extends StatefulWidget {
+  const ExamplePage({super.key});
+
   // final List<Map<String, dynamic>> data;
 
   // ExamplePage({required this.data});
@@ -67,7 +69,7 @@ class _ExamplePageState extends State<ExamplePage> {
       sizeFactor: animation,
       child: Card(
         child: ListTile(
-          leading: Icon(Icons.star, color: Colors.redAccent),
+          leading: const Icon(Icons.star, color: Colors.redAccent),
           title: Text('Member: ${item['member']}'),
           subtitle: Text('credit: ${item['credit']}'),
         ),
@@ -78,12 +80,12 @@ class _ExamplePageState extends State<ExamplePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Animated ListView')),
+      appBar: AppBar(title: const Text('Animated ListView')),
       body: Column(
         children: [
           TextButton(onPressed: (){
             _moveItemWithAnimation();
-          }, child: Text('move ')),
+          }, child: const Text('move ')),
           Expanded(
             child: AnimatedList(
               key: _listKey,
@@ -101,7 +103,7 @@ class _ExamplePageState extends State<ExamplePage> {
         onPressed: () {
           _moveItemWithAnimation();
         },
-        child: Icon(Icons.arrow_upward),
+        child: const Icon(Icons.arrow_upward),
       ),
     );
   }

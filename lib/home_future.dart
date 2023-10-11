@@ -8,7 +8,6 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:tournament_client/lib/bar_chart.widget.dart';
 import 'package:tournament_client/lib/bar_chart_race.dart';
 import 'package:tournament_client/utils/mycolors.dart';
-import 'package:tournament_client/widget/snackbar.custom.dart';
 
 class MyHomeFuture extends StatefulWidget {
   const MyHomeFuture({super.key, required this.title});
@@ -34,7 +33,7 @@ class _MyHomeFutureState extends State<MyHomeFuture> {
       print('Disconnected from server');
     });
     
-    await socket.connect(); // Await the connection
+    socket.connect(); // Await the connection
     
     socket.emit('eventFromClient');
 
@@ -53,7 +52,7 @@ class _MyHomeFutureState extends State<MyHomeFuture> {
               }
             }
             stationData.add(doubleList);
-            print('stationData: ${stationData}');
+            print('stationData: $stationData');
           }
         }
 
@@ -73,8 +72,8 @@ class _MyHomeFutureState extends State<MyHomeFuture> {
     super.initState();
     _initializeSocket();
   }
-   Future<Null> _refresh() async {
-    socket!.emit('eventFromClient');
+   Future<void> _refresh() async {
+    socket.emit('eventFromClient');
   }
 
   @override
@@ -107,7 +106,7 @@ class _MyHomeFutureState extends State<MyHomeFuture> {
               if (snapshot.data!.isEmpty ||
                   snapshot.data == null ||
                   snapshot.data == []) {
-                return Text('empty data');
+                return const Text('empty data');
               }
 
               return ScrollConfiguration(
@@ -121,7 +120,7 @@ class _MyHomeFutureState extends State<MyHomeFuture> {
                 ),
                 child: RefreshIndicator(
                     onRefresh: _refresh,
-                    child: BarChartRace(
+                    child: BarChartRace(selectedIndex: 1,
                       index: detect(1, formattedData[0]),
                       // index:0,
                       data: convertData(formattedData),
@@ -172,7 +171,7 @@ List<List<double>> convertData(data) {
 class FormattedDataText extends StatelessWidget {
   final List<List<double>> formattedData;
 
-  FormattedDataText({required this.formattedData});
+  const FormattedDataText({super.key, required this.formattedData});
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +215,7 @@ int detect(double targetIndex, List<double> myList) {
 
 List<Color> shuffleColorList() {
   final random = Random();
-  final sublistLength = 10;
+  const sublistLength = 10;
   final shuffledList = colorList.sublist(0, sublistLength)..shuffle(random);
   // Create a new list with the shuffled sublist
   final newList = List<Color>.from(colorList);

@@ -3,6 +3,8 @@ import 'package:tournament_client/home.dart';
 import 'package:tournament_client/utils/mycolors.dart';
 
 class WelcomePage extends StatefulWidget {
+  const WelcomePage({super.key});
+
   @override
   _WelcomePageState createState() => _WelcomePageState();
 }
@@ -13,6 +15,7 @@ class _WelcomePageState extends State<WelcomePage> {
       TextEditingController(text: 'http://localhost:8090');
   bool isDialogVisible = true;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  var checkboxValue = false;
 
   @override
   void initState() {
@@ -29,7 +32,7 @@ class _WelcomePageState extends State<WelcomePage> {
       body: Container(
         height: height,
         width: width,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -57,7 +60,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   alignment: Alignment.center,
                   width: 135,
                   height: 55,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       image: DecorationImage(
                           image: AssetImage('asset/image/logo_new.png'),
                           fit: BoxFit.contain)),
@@ -70,16 +73,25 @@ class _WelcomePageState extends State<WelcomePage> {
                   borderRadius:
                       BorderRadius.circular(10.0), // Set border radius
                 ),
-                title: Text('Player Setting'),
+                title: const Text('Player Setting'),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    CheckboxListTile(
+                        title: const Text("Member"),
+                        controlAffinity: ListTileControlAffinity.trailing,
+                        value: checkboxValue,
+                        onChanged: (value) {
+                          setState(() {
+                            checkboxValue = value!;
+                          });
+                        }),
                     TextField(
                       controller: controller,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 4.0),
+                            EdgeInsets.symmetric(horizontal: 4.0),
                         hintText: 'Enter player number (1-10)',
                       ),
                     ),
@@ -88,28 +100,36 @@ class _WelcomePageState extends State<WelcomePage> {
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 4.0),
+                            EdgeInsets.symmetric(horizontal: 4.0),
                         hintText: 'Enter host',
                       ),
                     ),
+                    
                   ],
                 ),
                 actions: [
                   TextButton(
                     onPressed: () {
-                      
-                      if (controller.text.isNotEmpty) {
+                      if(checkboxValue==false){
+                           Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => MyHomePage(
+                                  url: controllerUrl.text,
+                                  title: 'Tournament Client',
+                                  selectedIndex:111111)));
+                      }else
+                      {
+                        if (controller.text.isNotEmpty ) {
                         int? number = int.tryParse(controller.text);
                         if (number != null && number >= 1 && number <= 10) {
                           setState(() {
                             isDialogVisible = false; // Hide the dialog
                           });
                           final snackBar = SnackBar(
-                              duration: Duration(seconds: 1),
+                              duration: const Duration(seconds: 1),
                               backgroundColor: MyColor.black_text,
                               content: Text(
                                 'You chose as player ${controller.text}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontFamily: 'OpenSan',
                                     fontSize: 16,
                                     color: MyColor.white),
@@ -119,11 +139,11 @@ class _WelcomePageState extends State<WelcomePage> {
                           // Do something with the number here
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (_) => MyHomePage(
-                                  url: "${controllerUrl.text}",
+                                  url: controllerUrl.text,
                                   title: 'Tournament Client',
-                                  selectedIndex: int.parse(controller.text))));
+                                  selectedIndex:int.parse(controller.text))));
                         } else {
-                          final snackBar = SnackBar(
+                          const snackBar = SnackBar(
                               backgroundColor: MyColor.black_text,
                               content: Text(
                                 'Please input number from 1-10',
@@ -135,8 +155,9 @@ class _WelcomePageState extends State<WelcomePage> {
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
                       }
+                      }
                     },
-                    child: Text('Confirm'),
+                    child: const Text('Confirm'),
                   ),
                   TextButton(
                     onPressed: () {
@@ -144,7 +165,7 @@ class _WelcomePageState extends State<WelcomePage> {
                         isDialogVisible = false; // Hide the dialog
                       });
                     },
-                    child: Text('Close'),
+                    child: const Text('Close'),
                   ),
                 ],
               ),
@@ -155,7 +176,7 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 }
 
-void showInSnackBar(String value, _scaffoldKey) {
-  _scaffoldKey.currentState
-      .showSnackBar(new SnackBar(content: new Text(value)));
+void showInSnackBar(String value, scaffoldKey) {
+  scaffoldKey.currentState
+      .showSnackBar(SnackBar(content: Text(value)));
 }

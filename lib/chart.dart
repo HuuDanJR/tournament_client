@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_charts/sparkcharts.dart';
-import 'package:tournament_client/utils/mycolors.dart';
 
 class ChartPage extends StatelessWidget {
   const ChartPage({super.key});
@@ -12,7 +10,7 @@ class ChartPage extends StatelessWidget {
         body: SafeArea(
       child: Container(
         padding: const EdgeInsets.all(32),
-        child: AnimatedStackedBarChart(),
+        child: const AnimatedStackedBarChart(),
       ),
     ));
   }
@@ -20,6 +18,8 @@ class ChartPage extends StatelessWidget {
 
 
 class AnimatedStackedBarChart extends StatefulWidget {
+  const AnimatedStackedBarChart({super.key});
+
   @override
   _AnimatedStackedBarChartState createState() => _AnimatedStackedBarChartState();
 }
@@ -86,10 +86,10 @@ class _AnimatedStackedBarChartState extends State<AnimatedStackedBarChart> {
             ],
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         ElevatedButton(
           onPressed: switchDataSets,
-          child: Text('Switch Data Sets'),
+          child: const Text('Switch Data Sets'),
         ),
       ],
     );

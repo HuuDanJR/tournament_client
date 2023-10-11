@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:tournament_client/lib/bar_chart_race.dart';
@@ -79,8 +78,9 @@ class _BarCharRaceState extends State<BarCharRace> {
             BarChartRace(
       data: data!,
       index: 1,
+      selectedIndex: 1,
       initialPlayState: true,
-      columnsColor: [
+      columnsColor: const [
         Color(0xFFFF9900),
         MyColor.blue_coinbase,
         Color(0xFFA2AAAD),
@@ -88,7 +88,6 @@ class _BarCharRaceState extends State<BarCharRace> {
         Color(0xFF212326),
         MyColor.bedge,
         MyColor.pinkMain,
-        
         MyColor.green_araconda,
         MyColor.red_accent,
         MyColor.yellow_accent,
@@ -98,7 +97,7 @@ class _BarCharRaceState extends State<BarCharRace> {
       numberOfRactanglesToShow: 10,
       title: "TOP COMPANIES REVENUE",
       // title: "",
-      columnsLabel: [
+      columnsLabel: const [
         "Amazon",
         "Google",
         "Apple",
@@ -118,7 +117,7 @@ class _BarCharRaceState extends State<BarCharRace> {
           ),
         ),
       ),
-      titleTextStyle: TextStyle(
+      titleTextStyle: const TextStyle(
         color: Colors.black,
         fontSize: 24,
       ),

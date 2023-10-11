@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tournament_client/chart.dart';
-import 'package:tournament_client/example.dart';
-import 'package:tournament_client/home.dart';
-import 'package:tournament_client/home2.dart';
-import 'package:tournament_client/home_future.dart';
-import 'package:tournament_client/race_chart_page.dart';
+import 'package:tournament_client/tournament_page2.dart';
 import 'package:tournament_client/welcome.dart';
 
 void main() {
@@ -32,11 +27,13 @@ class MyApp extends StatelessWidget {
         // home: BarCharRace(),
         // home: MyHomePage(title: 'homepage',selectedIndex: 2,),
         // home: const MyHomePage2(title: 'Tournament Client'),
-        home: MyHomePage(
-            url: "http://localhost:8090",
-            title: 'Tournament Client',
-            selectedIndex: 1)
-        // home:WelcomePage()
+        // home: MyHomePage(
+        //     url: "http://localhost:8090",
+        //     title: 'Tournament Client',
+        //     selectedIndex: 1111111
+        // )
+        // home:const TournamentPage()
+        home:WelcomePage()
         );
   }
 }
